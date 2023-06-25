@@ -1,0 +1,1 @@
+console.log("There is no test yet, let's simply pretend that this program works!");

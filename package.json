@@ -1,0 +1,28 @@
+{
+  "name": "data-flow-builder",
+  "version": "1.0.0",
+  "description": "Tool for creating data flows for specific projects.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uumnk/data-flow-builder.git"
+  },
+  "keywords": [
+    "data",
+    "flow",
+    "builder",
+    "tool"
+  ],
+  "author": "uumnk",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/uumnk/data-flow-builder/issues"
+  },
+  "homepage": "https://github.com/uumnk/data-flow-builder#readme",
+  "bin": {
+    "data-flow-builder": "bin/index.js"
+  }
+}
