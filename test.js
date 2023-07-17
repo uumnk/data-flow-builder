@@ -1,1 +1,3 @@
-console.log("There is no test yet, let's simply pretend that this program works!");
+const execSync = require('child_process').execSync;
+
+execSync(`npm exec data-flow-builder build-script-example.js variable="{"key": value}"`);
