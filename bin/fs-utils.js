@@ -7,8 +7,8 @@ class FsUtils {
      * @param {string} source path to source folder/destination
      * @param {string} target path to destination folder
      */
-    copy(source, target){
-        if(fs.lstatSync(source).isDirectory()){
+    copy(source, target) {
+        if (fs.lstatSync(source).isDirectory()) {
             this.copyFolderRecursiveSync(source, target);
         } else {
             this.copyFileSync(source, target);
@@ -32,9 +32,8 @@ class FsUtils {
         let files = [];
 
         // Check if folder needs to be created or integrated
-        let targetFolder = path.join(target, path.basename(source));
-        if (!fs.existsSync(targetFolder)) {
-            fs.mkdirSync(targetFolder);
+        if (!fs.existsSync(target)) {
+            fs.mkdirSync(target);
         }
 
         // Copy
@@ -42,10 +41,11 @@ class FsUtils {
             files = fs.readdirSync(source);
             files.forEach((file) => {
                 let curSource = path.join(source, file);
+                let curTarget = path.join(target, file);
                 if (fs.lstatSync(curSource).isDirectory()) {
-                    this.copyFolderRecursiveSync(curSource, targetFolder);
+                    this.copyFolderRecursiveSync(curSource, curTarget);
                 } else {
-                    this.copyFileSync(curSource, targetFolder);
+                    this.copyFileSync(curSource, curTarget);
                 }
             });
         }

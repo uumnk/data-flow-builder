@@ -4,7 +4,7 @@ const path = require('path');
 const fsUtils = require("./fs-utils.js")
 const fsUtilsInstance = new fsUtils();
 
-const VERSION = "1.1.0";
+const VERSION = "1.1.3";
 
 let debugMode = false;
 
@@ -60,6 +60,16 @@ const f = {
 
         if (!fs.existsSync(path.resolve(file)) || force) {
             fs.writeFileSync(path.resolve(file), content);
+            return true;
+        } else {
+            return false;
+        }
+    },
+    rename: (file, newFile) => {
+        if (debugMode) console.log("[DEBUG] Function rename was called with params: " + file + ", " + newFile);
+
+        if (fs.existsSync(file)) {
+            fs.renameSync(file, newFile);
             return true;
         } else {
             return false;
