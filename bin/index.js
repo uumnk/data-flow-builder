@@ -1,6 +1,8 @@
 #! /usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const fsUtils = require("./fs-utils.js")
+const fsUtilsInstance = new fsUtils();
 
 const VERSION = "1.1.0";
 
@@ -51,6 +53,7 @@ const f = {
     },
     copy: (source, target) => {
         if (debugMode) console.log("[DEBUG] Function copy was called with params: " + source + ", " + target);
+        return fsUtilsInstance.copy(source, target);
     },
     createFile: (file, content, force) => {
         if (debugMode) console.log("[DEBUG] Function createFile was called with params: " + file + ", " + content);

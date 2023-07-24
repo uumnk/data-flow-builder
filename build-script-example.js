@@ -16,7 +16,7 @@ module.exports = (f, args, version) => {
     f.createFile(TEST_FILE, "data-flow-builder 1", true);
 
     // copy example
-    f.copy(TEST_FILE, TEST_FILE_COPY); // TODO copy is not yet implemented, do this manually
+    f.copy(TEST_FILE, TEST_FILE_COPY);
 
     // replace example
     let count;
