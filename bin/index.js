@@ -16,13 +16,13 @@ let file = args[0];
 
 let argMap = {};
 for (let arg of args.slice(1)) {
-    if (debugMode) console.log("Checking argument '" + arg + "'.");
+    if (debugMode) console.log("[DEBUG] Checking argument '" + arg + "'.");
     let equalsIndex = arg.indexOf("=");
     if (equalsIndex > 0) {
         let key = arg.substring(0, equalsIndex);
         let value = arg.substring(equalsIndex + 1);
         argMap[key] = value;
-        if (debugMode) console.log("Parameter '" + key + "' loaded from the arguments.");
+        if (debugMode) console.log("[DEBUG] Parameter '" + key + "' loaded from the arguments.");
     } else if (arg === "debug") {
         debugMode = true;
     }
@@ -30,7 +30,7 @@ for (let arg of args.slice(1)) {
 
 const f = {
     input: (key, message, defaultValue) => {
-        if (debugMode) console.log("Function input was called with params: " + key + ", " + message + ", " + defaultValue);
+        if (debugMode) console.log("[DEBUG] Function input was called with params: " + key + ", " + message + ", " + defaultValue);
 
         if (argMap[key] !== undefined) { // input value is in program arguments
             return argMap[key];
@@ -50,10 +50,10 @@ const f = {
         }
     },
     copy: (source, target) => {
-        if (debugMode) console.log("Function copy was called with params: " + source + ", " + target);
+        if (debugMode) console.log("[DEBUG] Function copy was called with params: " + source + ", " + target);
     },
     createFile: (file, content, force) => {
-        if (debugMode) console.log("Function createFile was called with params: " + file + ", " + content);
+        if (debugMode) console.log("[DEBUG] Function createFile was called with params: " + file + ", " + content);
 
         if (!fs.existsSync(path.resolve(file)) || force) {
             fs.writeFileSync(path.resolve(file), content);
@@ -63,16 +63,16 @@ const f = {
         }
     },
     replaceInFile: (file, searchValue, replaceValue) => {
-        if (debugMode) console.log("Function replace was called with params: " + file + ", " + searchValue + ", " + replaceValue);
+        if (debugMode) console.log("[DEBUG] Function replace was called with params: " + file + ", " + searchValue + ", " + replaceValue);
 
         let text = fs.readFileSync(path.resolve(file), 'utf8');
-        if (debugMode) console.log("File " + file + " was loaded.");
+        if (debugMode) console.log("[DEBUG] File " + file + " was loaded.");
 
         let count = 0;
         switch (typeof searchValue) {
             case "string":
                 // single string
-                if (debugMode) console.log("Search value is a string.");
+                if (debugMode) console.log("[DEBUG] Search value is a string.");
                 let innerReplaceResult = _innerReplace(text, searchValue, replaceValue);
                 count = innerReplaceResult.count;
                 text = innerReplaceResult.text;
@@ -80,14 +80,14 @@ const f = {
             case "object":
                 if (searchValue instanceof RegExp) {
                     // single regexp value
-                    if (debugMode) console.log("Search value is a RegExp.");
+                    if (debugMode) console.log("[DEBUG] Search value is a RegExp.");
                     let innerReplaceResult = _innerReplace(text, searchValue, replaceValue);
                     count = innerReplaceResult.count;
                     text = innerReplaceResult.text;
                     break;
                 } else if (Array.isArray(searchValue)) {
                     // array of arrays value
-                    if (debugMode) console.log("Search value is an array.");
+                    if (debugMode) console.log("[DEBUG] Search value is an array.");
                     for (let replacePair of searchValue) {
                         if (Array.isArray(replacePair)) {
                             let innerReplaceResult = _innerReplace(text, replacePair[0], replacePair[1]);
@@ -100,7 +100,7 @@ const f = {
                     break;
                 } else {
                     // map value
-                    if (debugMode) console.log("Search value is a map (object).");
+                    if (debugMode) console.log("[DEBUG] Search value is a map (object).");
                     for (const key in searchValue) {
                         let innerReplaceResult = _innerReplace(text, key, searchValue[key]);
                         count += innerReplaceResult.count;
@@ -119,19 +119,11 @@ const f = {
 
         function _innerReplace(text, searchValue, replaceValue) {
             if (typeof searchValue === "object" && searchValue instanceof RegExp) {
-                if (debugMode) console.log("Search value '" + searchValue + "' is a RegExp.");
+                if (debugMode) console.log("[DEBUG] Search value '" + searchValue + "' is a RegExp.");
                 return _innerSingleReplace(text, searchValue, replaceValue);
             } else if (typeof searchValue === "string") {
-                if (debugMode) console.log("Search value '" + searchValue + "' is a string.");
-                let count = 0;
-                let singleCount = 0;
-                do {
-                    let singleReplaceResult = _innerSingleReplace(text, searchValue, replaceValue);
-                    singleCount = singleReplaceResult.count;
-                    text = singleReplaceResult.text;
-                    count += singleCount;
-                } while (singleCount > 0);
-                return {count: count, text: text};
+                if (debugMode) console.log("[DEBUG] Search value '" + searchValue + "' is a string.");
+                return _innerSingleReplace(text, searchValue, replaceValue);
             } else {
                 console.error("Search value '" + searchValue + "' has unknown data type.");
                 return 0;
