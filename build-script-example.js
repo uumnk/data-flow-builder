@@ -2,7 +2,7 @@ const TEST_FILE = "./testFile.txt";
 const TEST_FILE_COPY = "./testFileCopy.txt";
 
 module.exports = (f, args, version) => {
-    if (version !== "1.1.3") {
+    if (version !== "1.1.4") {
         console.warn("Different version of data flow builder is used. Double-check the results!");
     }
 
@@ -30,7 +30,20 @@ module.exports = (f, args, version) => {
     console.log("Replaced " + count + " strings.");
     count = f.replaceInFile(TEST_FILE, [[/data-flow-builder 6/g, "data-flow-builder 7"], [/data-flow-builder 7/, "data-flow-builder 8"]]);
     console.log("Replaced " + count + " strings.");
-    count = f.replaceInFile(TEST_FILE, {"data-flow": "test ", "-builder 8": "was successful"});
+
+    count = f.replaceInFile(TEST_FILE, [
+        [/data-flow-(builder) 8/g, "data-flow-$1 9"],
+        [/data-flow-builder 9/, "$& 3/4"],
+        [/9 3\/4/, "$`10"],
+        [/data-flow-builder /, "$'11 > "],
+        [/1011/, "$`$$$&"],
+        [/(data)-(flow)-(builder)/g, "$1$2$3"],
+        [/(?<name>dataflowbuilder)/g, "awesome$<name>!"],
+        ["awesomedataflowbuilder! awesomedataflowbuilder! $1011 > awesomedataflowbuilder! 10", "data-flow-builder 12"]
+    ]);
+    console.log("Replaced " + count + " strings.");
+
+    count = f.replaceInFile(TEST_FILE, {"data-flow": "test ", "-builder 12": "was successful"});
     console.log("Replaced " + count + " strings.");
 
     // assert example

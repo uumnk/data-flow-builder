@@ -4,7 +4,7 @@ const path = require('path');
 const fsUtils = require("./fs-utils.js")
 const fsUtilsInstance = new fsUtils();
 
-const VERSION = "1.1.3";
+const VERSION = "1.1.4";
 
 let debugMode = false;
 
@@ -146,9 +146,36 @@ const f = {
         function _innerSingleReplace(text, searchValue, replaceValue) {
             let count = 0;
             if (replaceValue != null) {
-                text = text.replace(searchValue, function () {
+                text = text.replace(searchValue, function (match, ...args) {
+                    const hasNamedGroups = typeof args.at(-1) === "object";
+                    const namedGroups = hasNamedGroups ? args.at(-1) : {};
+                    const string = hasNamedGroups ? args.at(-2) : args.at(-1);
+                    const offset = hasNamedGroups ? args.at(-3) : args.at(-2);
+                    const groupsCount = args.length - (hasNamedGroups ? 3 : 2);
+
+                    let replacementPatternsSearchRegExp = new RegExp("\\$[$&`']|\\$\\d{1," + (groupsCount > 9 ? "2" : "1") + "}|\\$<[a-zA-Z][a-zA-Z0-9]*>", "g");
+                    let replacement = replaceValue.replace(replacementPatternsSearchRegExp, function (patternMatch) {
+                        if (patternMatch === "$$") {
+                            return "$";
+                        } else if (patternMatch === "$&") {
+                            return match;
+                        } else if (patternMatch === "$`") {
+                            return string.substring(0, offset);
+                        } else if (patternMatch === "$'") {
+                            return string.substring(offset + match.length);
+                        } else if (/^\$\d{1,2}$/.test(patternMatch)) {
+                            const groupNumber = Number(patternMatch.substring(1));
+                            return groupNumber < 1 || groupNumber > groupsCount ? patternMatch : args[groupNumber - 1];
+                        } else if (/^\$<[a-zA-Z][a-zA-Z0-9]*>$/.test(patternMatch)) {
+                            let groupName = patternMatch.substring(2, patternMatch.length - 1);
+                            return namedGroups[groupName] !== undefined ? namedGroups[groupName] : patternMatch;
+                        } else {
+                            return patternMatch;
+                        }
+                    })
+
                     count += 1;
-                    return replaceValue;
+                    return replacement;
                 })
             }
             return {count: count, text: text};
