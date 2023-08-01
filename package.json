@@ -1,6 +1,6 @@
 {
   "name": "data-flow-builder",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Tool for creating data flows for specific projects.",
   "main": "index.js",
   "scripts": {
