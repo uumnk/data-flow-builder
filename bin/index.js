@@ -4,7 +4,7 @@ const path = require('path');
 const fsUtils = require("./fs-utils.js")
 const fsUtilsInstance = new fsUtils();
 
-const VERSION = "1.1.4";
+const VERSION = "1.1.5";
 
 let debugMode = false;
 
@@ -101,10 +101,11 @@ const f = {
                 } else if (Array.isArray(searchValue)) {
                     // array of arrays value
                     if (debugMode) console.log("[DEBUG] Search value is an array.");
+                    count = [];
                     for (let replacePair of searchValue) {
                         if (Array.isArray(replacePair)) {
                             let innerReplaceResult = _innerReplace(text, replacePair[0], replacePair[1]);
-                            count += innerReplaceResult.count;
+                            count.push(innerReplaceResult.count);
                             text = innerReplaceResult.text;
                         } else {
                             console.warn("Element " + replacePair + " is not and array.");
@@ -114,9 +115,10 @@ const f = {
                 } else {
                     // map value
                     if (debugMode) console.log("[DEBUG] Search value is a map (object).");
+                    count = [];
                     for (const key in searchValue) {
                         let innerReplaceResult = _innerReplace(text, key, searchValue[key]);
-                        count += innerReplaceResult.count;
+                        count.push(innerReplaceResult.count);
                         text = innerReplaceResult.text;
                     }
                     break;
@@ -182,7 +184,43 @@ const f = {
         }
     },
     assert: (expected, actual) => {
-        console.log("assert called (" + expected + ", " + actual + ")");
+        if (debugMode) console.log("[DEBUG] Function assert was called with params: " + expected + ", " + actual);
+
+        let result;
+        if (expected !== undefined && actual === undefined) {
+            result = !!expected; // only one argument is filled, process it as boolean condition
+            if (!result) {
+                throw new Error("Assert has failed: value '" + expected + "' is not true.");
+            }
+        } else if (expected !== undefined && actual !== undefined) {
+            if (typeof expected === "object" && Array.isArray(expected) && typeof actual === "object" && Array.isArray(actual)) {
+                result = actual.length === expected.length && actual.every((value, index) => value === expected[index]);
+            } else {
+                result = expected === actual; // both arguments are filled, compare them
+            }
+            if (!result) {
+                throw new Error("Assert has failed: actual value '" + actual + "' does not strictly equal to expected value '" + expected + "'.");
+            }
+        } else {
+            throw new Error("Assert has failed: at least one (the first) parameter of this function must be defined.");
+        }
+
+        if (debugMode) console.log("[DEBUG] Assertion has passed.");
+    },
+    loadJson: (file, reviver) => {
+        if (debugMode) console.log("[DEBUG] Function loadJson was called with params: " + file + ", " + searchValue + ", " + replaceValue);
+
+        let text = fs.readFileSync(path.resolve(file), 'utf8');
+        if (debugMode) console.log("[DEBUG] File " + file + " was loaded.");
+
+        return JSON.parse(text, reviver);
+    },
+    saveJson: (file, jsonObject, replacer, space = 2, prefix = "", postfix = "\n") => {
+        if (debugMode) console.log("[DEBUG] Function saveJson was called with params: " + file + ", " + searchValue + ", " + replaceValue);
+
+        let text = JSON.stringify(jsonObject, replacer, space);
+        fs.writeFileSync(path.resolve(file), prefix + text + postfix);
+        if (debugMode) console.log("[DEBUG] File " + file + " was saved.");
     }
 }
 

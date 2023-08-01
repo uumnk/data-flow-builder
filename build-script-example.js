@@ -2,7 +2,7 @@ const TEST_FILE = "./testFile.txt";
 const TEST_FILE_COPY = "./testFileCopy.txt";
 
 module.exports = (f, args, version) => {
-    if (version !== "1.1.4") {
+    if (version !== "1.1.5") {
         console.warn("Different version of data flow builder is used. Double-check the results!");
     }
 
