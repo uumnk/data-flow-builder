@@ -3,8 +3,13 @@ const fs = require('fs');
 const path = require('path');
 const fsUtils = require("./fs-utils.js")
 const fsUtilsInstance = new fsUtils();
+const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 
-const VERSION = "1.1.5";
+const VERSION = "1.1.6";
 
 let debugMode = false;
 
@@ -37,18 +42,35 @@ const f = {
         if (argMap[key] !== undefined) { // input value is in program arguments
             return argMap[key];
         } else { // need to get that input value
-            let value;
-
-            console.log(`<${key}> ${message}${defaultValue ? " [" + defaultValue + "]" : ""}: `);
-            console.warn("Please provide parameter '" + key + "' in program arguments (in " + key + "=value syntax), the data-flow-builder can not read from the console yet.");
-
-            // let value = readlineSync.question(`<${key}> ${message}${defaultValue ? " [" + defaultValue + "]" : ""}: `); // TODO it does not work with UTF-8
+            const prompt = `<${key}> ${message}${defaultValue ? " [" + defaultValue + "]" : ""}: `;
+            const value = _readInputSync(prompt);
 
             if (!value && defaultValue !== undefined) {
                 return defaultValue;
             }
 
             return value;
+        }
+
+        /**
+         * Reads user input synchronously. Module readline is only asynchronous and module readline-sync cannot properly work with UTF-8 characters. For these reasons this function converting async
+         * call to sync was created.
+         * @param question question (prompt) to write into console before user input
+         * @returns string answer from the user
+         * @private
+         */
+        function _readInputSync(question) {
+            let userInput = null;
+            rl.question(question, (answer) => {
+                userInput = answer;
+            });
+
+            while (userInput === null) {
+                require('deasync').runLoopOnce(); // wait for user input
+            }
+
+            rl.close(); // stop readline
+            return userInput;
         }
     },
     copy: (source, target) => {

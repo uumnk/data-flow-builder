@@ -24,5 +24,8 @@
   "homepage": "https://github.com/uumnk/data-flow-builder#readme",
   "bin": {
     "data-flow-builder": "bin/index.js"
+  },
+  "dependencies": {
+    "deasync": "^0.1.28"
   }
 }

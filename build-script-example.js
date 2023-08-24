@@ -2,11 +2,15 @@ const TEST_FILE = "./testFile.txt";
 const TEST_FILE_COPY = "./testFileCopy.txt";
 
 module.exports = (f, args, version) => {
-    if (version !== "1.1.5") {
+    if (version !== "1.1.6") {
         console.warn("Different version of data flow builder is used. Double-check the results!");
     }
 
     console.log("Hello world from build script!");
+
+    // manual input:
+    const manualInput = f.input("manual", "Enter some value manually", "some default value");
+    console.log("Manually entered value was: " + manualInput);
 
     // input example
     let value = f.input("variable", "Enter the value", "default value");
@@ -47,6 +51,6 @@ module.exports = (f, args, version) => {
     console.log("Replaced " + count + " strings.");
 
     // assert example
-    f.assert(1 === 1); // TODO assert is not implemented yet
+    f.assert(1 === 1);
     console.log("End of the build script.");
 };
